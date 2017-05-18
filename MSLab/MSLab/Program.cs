@@ -13,28 +13,34 @@ namespace MSLab
             String strInput;
             bool validIn;
 
-            Console.WriteLine("This program reformats coordinates. Please enter as many as you would like to reformat (xx.xx, xx.xx). To see the results, enter \"q\".");
-
-            strInput = Console.ReadLine();
+            Console.WriteLine("This program reformats coordinates. \nPlease enter as many as you would like to reformat (xx.xx, xx.xx). \n\nTo see the results, enter \"q\".");
 
             do
             {
+
+                strInput = Console.ReadLine();
                 validIn = ValidateInput(strInput);
 
                 if (validIn)
                 {
-                    lstXCoordinates.Add(float.Parse(strInput.Split(',')[0]));
-                    lstYCoordinates.Add(float.Parse(strInput.Split(',')[1]));
+                    lstXCoordinates.Add(double.Parse(strInput.Split(',')[0].Trim()));
+                    lstYCoordinates.Add(double.Parse(strInput.Split(',')[1].Trim()));
 
                 }
             } while (validIn);
 
             List<String> lstFormatedCoordinates = ReformatCoordinates(lstXCoordinates, lstYCoordinates);
 
+            Console.WriteLine("\n\n\n\n--- RESULTS ---\n\n");
+
             foreach (var coordinate in lstFormatedCoordinates)
             {
                 Console.WriteLine(coordinate);
             }
+
+            Console.WriteLine("\n\n\n\nPress Enter to Exit...");
+
+            strInput = Console.ReadLine();
         }
 
         /// <summary>
@@ -47,10 +53,19 @@ namespace MSLab
         /// </returns>
         public static bool ValidateInput(String strIn)
         {
+
+            const double LatValue = 90;
+            const double LonValue = 180;
             try
             {
                 double d;
-                if (strIn.IndexOf(",") >= 0 && double.TryParse(strIn.Split(',')[0], out d) && double.TryParse(strIn.Split(',')[1], out d))
+                if (
+                    strIn.IndexOf(",") >= 0 
+                    && double.TryParse(strIn.Split(',')[0], out d)
+                    && Math.Abs(double.Parse(strIn.Split(',')[0].Trim())) <= LatValue
+                    && double.TryParse(strIn.Split(',')[1], out d)
+                    && Math.Abs(double.Parse(strIn.Split(',')[1].Trim())) <= LonValue
+                    )
                 {
                     return true;
                 }
@@ -80,18 +95,24 @@ namespace MSLab
         {
             List<String> lstResult = new List<String>();
 
-            if (lstX.Count == lstY.Count)
+            if (
+                lstX.Count > 0
+                && lstX.Count == lstY.Count
+                )
             {
-                for (int i = 0; i <= lstX.Count; i++)
+                for (int i = 0; i < lstX.Count; i++)
                 {
-                    lstResult.Add("x:" + lstX[i] + " y:" + lstY[i]);
+                    if (!lstResult.Contains("x:" + lstX[i] + " y:" + lstY[i]))
+                    {
+                        lstResult.Add("x:" + lstX[i] + " y:" + lstY[i]);
+                    }
                 }
 
                 return lstResult;
             }
             else
             {
-                lstResult.Add("You did not enter a valid Coordinate.");
+                lstResult.Add("Please enter valid coordinates.");
 
                 return lstResult;
             }
